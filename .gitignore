@@ -2,3 +2,4 @@ service-account.json
 /temp/
 *.pyc
 
+/__pycache__/
