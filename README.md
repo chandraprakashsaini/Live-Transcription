@@ -26,7 +26,7 @@ export GOOGLE_APPLICATION_CREDENTIALS="path to google service account key"
 ## Usage
 ```python
 
-python3 main.py
+streamlit run main.py
 
 ```
 
