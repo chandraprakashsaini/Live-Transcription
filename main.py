@@ -93,7 +93,7 @@ async def main():
                 print(gpt_transcipts)
 
                 try:
-                    gpt_results = await process_transcription(gpt_transcipts)
+                    gpt_results = process_transcription(gpt_transcipts)
 
                     for i, gpt_result in enumerate(gpt_results):
                         print(f"completed task {i}: {gpt_result['task_description']}")
@@ -117,6 +117,10 @@ def run():
 
     if uploaded_file is not None:
 
+        
+        all_text = []
+        box_id = str(uuid.uuid4())
+        transcript_container = st.empty()
         id = str(uuid.uuid4())
         order = 0
         transcripts = []
@@ -131,7 +135,7 @@ def run():
         context_size = 0
         progress_bar = st.progress(0)
         total_chunks = len(range(0, len(audio), chunk_duration_ms))
-        completed_tasks = set()
+        completed_tasks = {}
         for idx, start_ms in enumerate(range(0, len(audio), chunk_duration_ms)):
             end_ms = min(start_ms + chunk_duration_ms, len(audio))
             chunk = audio[start_ms:end_ms]
@@ -159,7 +163,7 @@ def run():
                     gpt_transcripts = " ".join(gpt_batch)
 
                     try:
-                        gpt_results =asyncio.run(process_transcription(gpt_transcripts))
+                        gpt_results =process_transcription(gpt_transcripts)
 
                         for i, gpt_result in enumerate(gpt_results):
                             if gpt_result['task_description'] not in completed_tasks:
@@ -168,10 +172,14 @@ def run():
                                 completed_tasks[gpt_result['task_description']] = gpt_result
                             
                     except Exception as e:
-                        st.error(e)
+                        all_text.append(f"Error: chat gpt summary failed")
                     context_size = 0
 
-                st.write(f"{convert_seconds_to_hhmmss(int(start_ms/1000))}: {transcript}")
+                all_text.append(f"{convert_seconds_to_hhmmss(int(start_ms/1000))}: {transcript}")
+
+                last_10_transcripts = all_text[-15:]
+                transcript_container.text_area("Transcription", value="\n".join(last_10_transcripts), height=400)
+                
 
             progress_bar.progress((idx + 1) / total_chunks)
 
@@ -181,3 +189,4 @@ def run():
 
 if __name__ == "__main__":
     run()
+    

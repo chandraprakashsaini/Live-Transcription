@@ -1,12 +1,12 @@
 import openai
 import json
-import time
+import os
 
 # Set up your OpenAI API key
-openai.api_key = 'your_openai_api_key_here'
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Function to process the transcription and send to ChatGPT for multiple tasks processing
-async def process_transcription(transcription_text):
+def process_transcription(transcription_text):
     prompt = f"""
     You are a task manager bot that receives a transcript of multiple ongoing tasks in real time. Based on the transcript, identify all tasks and return a JSON response with the following structure:
     - Each task should have:
@@ -35,7 +35,7 @@ async def process_transcription(transcription_text):
     
     # Make an asynchronous request to the OpenAI API
     try:
-        response = await openai.ChatCompletion.acreate(
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
